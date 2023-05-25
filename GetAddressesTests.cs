@@ -30,7 +30,8 @@ public class GetAddressesTests
     {
         var result = await this.service.GetAddressesAsync(new AddressFilter { Line1 = "123 Main St", City = "Ontario", StateCode = "CA" }).ConfigureAwait(false);
 
-        // TODO: Complete the test
-        throw new NotImplementedException();
+        Assert.NotNull(result);
+        Assert.True(result.Addresses?.Count > 1);
+
     }
 }
