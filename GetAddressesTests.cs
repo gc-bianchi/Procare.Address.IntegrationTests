@@ -31,7 +31,14 @@ public class GetAddressesTests
         var result = await this.service.GetAddressesAsync(new AddressFilter { Line1 = "123 Main St", City = "Ontario", StateCode = "CA" }).ConfigureAwait(false);
 
         Assert.NotNull(result);
+        Assert.NotNull(result.Addresses);
         Assert.True(result.Addresses?.Count > 1);
+        Assert.Equal(result.Count, result.Addresses!.Count);
 
+        var pattern = @"123\s[W|E]\sMAIN\sST";
+        foreach (var address in result.Addresses)
+        {
+            Assert.Matches(pattern, address.Line1);
+        }
     }
 }
