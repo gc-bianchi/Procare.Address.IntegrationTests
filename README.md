@@ -17,7 +17,7 @@ This repository contains integration tests for the Procare Address API. The API 
 ## Running the tests
 
 To run the tests, use the following command:
-dotnet test
+- dotnet test
 
 ## Test Cases
 
