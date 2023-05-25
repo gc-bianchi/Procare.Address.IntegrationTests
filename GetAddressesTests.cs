@@ -28,6 +28,7 @@ public class GetAddressesTests
     [Fact]
     public async Task GetAddresses_With_AmbiguousAddress_ShouldResultIn_MultipleMatchingAddresses()
     {
+        var pattern = @"123\s[W|E]\sMAIN\sST";
         var result = await this.service.GetAddressesAsync(new AddressFilter { Line1 = "123 Main St", City = "Ontario", StateCode = "CA" }).ConfigureAwait(false);
 
         Assert.NotNull(result);
@@ -35,7 +36,7 @@ public class GetAddressesTests
         Assert.True(result.Addresses?.Count > 1);
         Assert.Equal(result.Count, result.Addresses!.Count);
 
-        var pattern = @"123\s[W|E]\sMAIN\sST";
+
         foreach (var address in result.Addresses)
         {
             Assert.Matches(pattern, address.Line1);
@@ -48,13 +49,15 @@ public class GetAddressesTests
         var result = await this.service.GetAddressesAsync(new AddressFilter { Line1 = "1234 Imaginary St", City = "Nowhere", StateCode = "ZZ" }).ConfigureAwait(false);
 
         Assert.NotNull(result);
-        Assert.Null(result.Addresses);
+        Assert.Equal(0, result.Addresses!.Count);
     }
 
     [Fact]
     public async Task GetAddresses_With_ValidUSTerritoryAddress_ShouldReturn_ValidMatches()
     {
-        var result = await this.service.GetAddressesAsync(new AddressFilter { Line1 = "123 San Juan St", City = "San Juan", StateCode = "PR" }).ConfigureAwait(false);
+        var city = "SAN JUAN";
+        var stateCode = "PR";
+        var result = await this.service.GetAddressesAsync(new AddressFilter { Line1 = "123 San Juan St", City = city, StateCode = stateCode }).ConfigureAwait(false);
 
         Assert.NotNull(result);
         Assert.NotNull(result.Addresses);
@@ -62,8 +65,8 @@ public class GetAddressesTests
 
         foreach (var address in result.Addresses!)
         {
-            Assert.Contains("San Juan", address.City);
-            Assert.Equal("PR", address.StateCode);
+            Assert.Contains(city, address.City);
+            Assert.Equal(stateCode, address.StateCode);
         }
     }
 }
