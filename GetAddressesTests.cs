@@ -41,4 +41,29 @@ public class GetAddressesTests
             Assert.Matches(pattern, address.Line1);
         }
     }
+
+    [Fact]
+    public async Task GetAddresses_With_NonExistentAddress_ShouldResultIn_NoMatches()
+    {
+        var result = await this.service.GetAddressesAsync(new AddressFilter { Line1 = "1234 Imaginary St", City = "Nowhere", StateCode = "ZZ" }).ConfigureAwait(false);
+
+        Assert.NotNull(result);
+        Assert.Null(result.Addresses);
+    }
+
+    [Fact]
+    public async Task GetAddresses_With_ValidUSTerritoryAddress_ShouldReturn_ValidMatches()
+    {
+        var result = await this.service.GetAddressesAsync(new AddressFilter { Line1 = "123 San Juan St", City = "San Juan", StateCode = "PR" }).ConfigureAwait(false);
+
+        Assert.NotNull(result);
+        Assert.NotNull(result.Addresses);
+        Assert.True(result.Addresses?.Count > 0);
+
+        foreach (var address in result.Addresses!)
+        {
+            Assert.Contains("San Juan", address.City);
+            Assert.Equal("PR", address.StateCode);
+        }
+    }
 }
